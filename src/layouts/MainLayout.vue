@@ -14,15 +14,18 @@
         <q-toolbar-title>
           Rick and Morty App
         </q-toolbar-title>
-        <q-tabs v-model="tab">
-          <q-tab name="images" label="Images" />
+        <q-tabs>
+          <q-route-tab
+            name="home"
+            label="home"
+            :to="{ path: '/', params: {} }"
+          />
           <q-route-tab
             name="characters"
             label="Characters"
             :to="{ name: 'characters', params: {} }"
           >
           </q-route-tab>
-          <q-tab name="articles" label="Articles" />
         </q-tabs>
       </q-toolbar>
     </q-header>

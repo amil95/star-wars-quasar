@@ -19,8 +19,8 @@ export default class CharacterService {
   }
 
   public static async getCharactersByPage(
-    page: number
-    // rowsPerPage: number
+    page: number,
+    rowsPerPage: number
   ): Promise<{ total: number; characters: Character[] }> {
     let chars: { total: number; characters: Character[] } = {
       total: 0,
@@ -39,31 +39,34 @@ export default class CharacterService {
       };
     }
 
-    // const calculatedPage = page / (20 / rowsPerPage);
+    const calculatedPage = Math.ceil(page / (20 / rowsPerPage));
 
     await axios
       .post('https://rickandmortyapi.com/graphql', {
         query: `
                query{
-                    characters(page: ${page}) {
+                    characters(page: ${calculatedPage}) {
                         info {
                           count
                         },
                         results {
                             name,
                             id,
+                            image
                         }
                     }
                 }
                `
       })
-      .then(
-        (res: queryResult) =>
-          (chars = {
-            total: res.data.data.characters.info.count,
-            characters: res.data.data.characters.results //.splice(rowsPerPage)
-          })
-      )
+      .then((res: queryResult) => {
+        return (chars = {
+          total: res.data.data.characters.info.count,
+          characters: res.data.data.characters.results.splice(
+            page % 2 == 0 ? rowsPerPage : 0,
+            rowsPerPage
+          )
+        });
+      })
       .catch(err => console.error(err));
     return chars;
   }
