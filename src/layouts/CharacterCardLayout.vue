@@ -1,9 +1,11 @@
 <template>
     <div class="q-pa-md row">
         <div class="col" />
-        <q-card class="col-8" bordered separator>
+        <q-card bordered separator class="q-pa-md bg-grey-10 col-8">
             <q-card-section>
-                <div class="text-h6 text-center">{{ character.name }}</div>
+                <div class="text-h6 text-center text-yellow">
+                    {{ character.name }}
+                </div>
             </q-card-section>
             <q-tabs v-model="tab" class="text-teal">
                 <q-tab label="Details" name="Details" />
@@ -82,6 +84,10 @@
                         </q-item>
                     </q-card>
                 </q-tab-panel>
+                <q-tab-panel name="Starships" v-if="!starships.length">
+                    <q-spinner-bars v-if="loading"></q-spinner-bars>
+                    <a v-else>This Character has no Starships registered.</a>
+                </q-tab-panel>
             </q-tab-panels>
         </q-card>
         <div class="col" />
@@ -101,6 +107,7 @@ export default defineComponent({
     setup() {
         let character: Ref<Character> = ref({ name: '' });
         let starships: Ref<Array<Starship>> = ref([{}]);
+        let loading = ref(false);
 
         let listables = [
             'height',
@@ -117,9 +124,11 @@ export default defineComponent({
         CharacterService.getCharacterById(Number.parseInt(id)).then(
             async (res) => {
                 character.value = res;
+                loading.value = true;
                 starships.value = await CharacterService.getStarships(
                     character.value
                 );
+                loading.value = false;
             }
         );
 
@@ -127,6 +136,7 @@ export default defineComponent({
             character,
             listables,
             starships,
+            loading,
             tab: ref('Details'),
         };
     },

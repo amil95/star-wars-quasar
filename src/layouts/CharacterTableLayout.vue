@@ -1,27 +1,34 @@
 <template>
-    <q-table
-        grid
-        :loading="loading"
-        :rows="Characters"
-        v-model:pagination="pagination"
-        @request="onRequest"
-        :rows-per-page-options="[10]"
-        :columns="columns"
-    >
-        <template v-slot:item="props">
-            <div class="q-pa-xs col-xs-12 col-sm-6 col-md-2">
-                <q-card @click="goCharacter(props.row.url.split('/')[5])">
-                    <q-card-section class="text-center">
-                        <strong>{{ props.row.name }}</strong>
-                    </q-card-section>
-                    <q-separator />
-                    <q-card-section class="flex flex-center">
-                        <img :src="props.row.image" height="100" />
-                    </q-card-section>
-                </q-card>
-            </div>
-        </template>
-    </q-table>
+    <div class="row">
+        <div class="col" />
+        <q-table
+            grid
+            :loading="loading"
+            :rows="Characters"
+            v-model:pagination="pagination"
+            @request="onRequest"
+            :rows-per-page-options="[10]"
+            :columns="columns"
+        >
+            <template v-slot:item="props">
+                <div class="q-pa-xs col-4">
+                    <q-card
+                        @click="goCharacter(props.row.url.split('/')[5])"
+                        dark
+                    >
+                        <q-card-section class="text-center text-yellow">
+                            <strong>{{ props.row.name }}</strong>
+                        </q-card-section>
+                        <q-separator />
+                        <q-card-section class="flex flex-center">
+                            <img :src="props.row.image" height="100" />
+                        </q-card-section>
+                    </q-card>
+                </div>
+            </template>
+        </q-table>
+        <div class="col" />
+    </div>
 </template>
 
 <script lang="ts">
@@ -60,9 +67,9 @@ export default defineComponent({
         }
 
         function getPictures() {
-            Characters.value.forEach(async (char) => {
-                char.image = await CharacterService.getPicture(char.name);
-            });
+            // Characters.value.forEach(async (char) => {
+            //     char.image = await CharacterService.getPicture(char.name);
+            // });
         }
 
         function onRequest(props: { pagination: { page: number } }) {

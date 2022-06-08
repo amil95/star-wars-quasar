@@ -1,7 +1,7 @@
 <template>
     <q-layout view="lHh Lpr lFf">
         <q-header elevated>
-            <q-toolbar>
+            <q-toolbar class="bg-black text-yellow">
                 <q-toolbar-title> Star Wars App </q-toolbar-title>
                 <q-tabs>
                     <q-route-tab
