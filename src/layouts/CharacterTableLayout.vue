@@ -1,21 +1,27 @@
 <template>
-  <q-table
-    :loading="loading"
-    :rows="Characters"
-    v-model:pagination="pagination"
-    @request="onRequest"
-    :rows-per-page-options="[10]"
-    :columns="columns"
-  >
-    <template v-slot:body="props">
-      <q-tr :props="props" @click="goCharacter(props.row.id)">
-        <q-td key="image" :props="props">
-          <img :src="props.row.image" height="50" />
-        </q-td>
-        <q-td key="name" :props="props">{{ props.row.name }}</q-td>
-      </q-tr>
-    </template>
-  </q-table>
+    <q-table
+        grid
+        :loading="loading"
+        :rows="Characters"
+        v-model:pagination="pagination"
+        @request="onRequest"
+        :rows-per-page-options="[10]"
+        :columns="columns"
+    >
+        <template v-slot:item="props">
+            <div class="q-pa-xs col-xs-12 col-sm-6 col-md-2">
+                <q-card @click="goCharacter(props.row.url.split('/')[5])">
+                    <q-card-section class="text-center">
+                        <strong>{{ props.row.name }}</strong>
+                    </q-card-section>
+                    <q-separator />
+                    <q-card-section class="flex flex-center">
+                        <img :src="props.row.image" height="100" />
+                    </q-card-section>
+                </q-card>
+            </div>
+        </template>
+    </q-table>
 </template>
 
 <script lang="ts">
@@ -25,42 +31,57 @@ import { Character } from '../models/Character';
 import router from '../router/index';
 
 export default defineComponent({
-  name: 'CharacterTable',
+    name: 'CharacterTable',
 
-  setup() {
-    let Characters: Ref<Character[]> = ref([]);
-    let pagination = ref({
-      page: 1,
-      rowsPerPage: 10,
-      rowsNumber: 0
-    });
-    let loading = ref(true);
-    const columns = [
-      { name: 'image', label: 'Image', field: 'image', align: 'left' },
-      { name: 'name', label: 'Name', field: 'name', align: 'left' }
-    ];
+    setup() {
+        let Characters: Ref<Character[]> = ref([]);
+        let pagination = ref({
+            page: 1,
+            rowsPerPage: 10,
+            rowsNumber: 0,
+        });
+        let loading = ref(true);
+        const columns = [
+            { name: 'image', label: 'Image', field: 'image', align: 'left' },
+            { name: 'name', label: 'Name', field: 'name', align: 'left' },
+        ];
 
-    function getPage(page: number) {
-      CharacterService.getCharactersByPage(page, 10).then(res => {
-        Characters.value = res.characters;
-        pagination.value.rowsNumber = res.total;
-        loading.value = false;
-      });
-    }
+        function getPage(page: number) {
+            CharacterService.getCharactersByPage(page).then((res) => {
+                Characters.value = res.characters;
+                pagination.value.rowsNumber = res.total;
+                loading.value = false;
+                getPictures();
+            });
+        }
 
-    function goCharacter(charName: string) {
-      router().push({ path: '/characters/' + charName });
-    }
+        function goCharacter(charName: string) {
+            void router().push({ path: '/character/' + charName });
+        }
 
-    function onRequest(props: any) {
-      const newPage = props.pagination.page;
-      loading.value = true;
-      pagination.value.page = newPage;
-      getPage(newPage);
-    }
+        function getPictures() {
+            Characters.value.forEach(async (char) => {
+                char.image = await CharacterService.getPicture(char.name);
+            });
+        }
 
-    getPage(1);
-    return { columns, Characters, pagination, onRequest, loading, goCharacter };
-  }
+        function onRequest(props: { pagination: { page: number } }) {
+            const newPage = props.pagination.page;
+            loading.value = true;
+            pagination.value.page = newPage;
+            getPage(newPage);
+        }
+
+        getPage(1);
+        return {
+            columns,
+            Characters,
+            pagination,
+            onRequest,
+            loading,
+            goCharacter,
+            getPictures,
+        };
+    },
 });
 </script>
