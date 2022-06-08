@@ -67,9 +67,9 @@ export default defineComponent({
         }
 
         function getPictures() {
-            // Characters.value.forEach(async (char) => {
-            //     char.image = await CharacterService.getPicture(char.name);
-            // });
+            Characters.value.forEach(async (char) => {
+                char.image = await CharacterService.getPicture(char.name);
+            });
         }
 
         function onRequest(props: { pagination: { page: number } }) {
